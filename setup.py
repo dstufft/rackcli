@@ -33,6 +33,9 @@ setup(
     packages=[
         'rackcli',
     ],
+    entry_points = {
+        "console_scripts": ['rackcli = rackcli.rackcli:main']
+        },
     package_dir={'rackcli':
                  'rackcli'},
     include_package_data=True,
