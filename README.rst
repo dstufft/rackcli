@@ -15,7 +15,7 @@ rackcli
 
 minimalistic rackspace cloud cli based on python-openstacksdk
 
-* Free software: BSD license
+* Free software: Apache 2.0
 * Documentation: https://rackcli.readthedocs.org.
 
 Features
