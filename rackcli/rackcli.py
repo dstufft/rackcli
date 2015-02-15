@@ -7,8 +7,32 @@ Apache License 2.0
 
 Stuff
 """
+import os
+import sys
 import click
 import config
+
+
+class Context(object):
+    """ Configuration context """
+    def __init__(self):
+        self.verbose = False
+        self.config = None
+
+    def log(self, msg, *args):
+        """Logs a message to stderr."""
+        if args:
+            msg %= args
+        click.echo(msg, file=sys.stderr)
+
+    def vlog(self, msg, *args):
+        """Logs a message to stderr only if verbose is enabled."""
+        if self.verbose:
+            self.log(msg, *args)
+
+
+pass_ctx = click.make_pass_decorator(Context, ensure=True)
+cmd_folder = os.path.join(os.path.dirname(__file__), 'commands')
 
 
 def print_version(ctx, param, value):
@@ -19,7 +43,28 @@ def print_version(ctx, param, value):
     ctx.exit()
 
 
-@click.command()
+class ComplexCLI(click.MultiCommand):
+
+    def list_commands(self, ctx):
+        rv = []
+        for filename in os.listdir(cmd_folder):
+            if filename.endswith('.py'):
+                rv.append(filename[4:-3])
+        rv.sort()
+        return rv
+
+    def get_command(self, ctx, name):
+        try:
+            if sys.version_info[0] == 2:
+                name = name.encode('ascii', 'replace')
+            mod = __import__('complex.commands.cmd_' + name,
+                             None, None, ['cli'])
+        except ImportError:
+            return
+        return mod.cli
+
+
+@click.command(cls=ComplexCLI)
 @click.option('--debug', '-d', is_flag=True, default=False)
 @click.option('--no-verify-ssl', is_flag=True, default=False,
               help='Disable SSL - not recommended, considered harmful')
@@ -34,7 +79,8 @@ def print_version(ctx, param, value):
               help='The region to use. Overrides config/env settings.')
 @click.option('--version', is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
-def cli(debug, no_verify_ssl, config_file, output, profile, region):
+@pass_ctx
+def cli(ctx, debug, no_verify_ssl, config_file, output, profile, region):
     """ rackcli [options] <command> <subcommand> [parameters] """
     overrides = False
     if config_file:
