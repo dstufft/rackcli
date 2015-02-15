@@ -35,14 +35,6 @@ pass_ctx = click.make_pass_decorator(Context, ensure=True)
 cmd_folder = os.path.join(os.path.dirname(__file__), 'commands')
 
 
-def print_version(ctx, param, value):
-    if not value or ctx.resilient_parsing:
-        return
-    # how do I get this from __init__.py fml
-    click.echo('0.1.1')
-    ctx.exit()
-
-
 class ComplexCLI(click.MultiCommand):
 
     def list_commands(self, ctx):
@@ -63,6 +55,14 @@ class ComplexCLI(click.MultiCommand):
         except ImportError:
             raise
         return mod.cli
+
+
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    # how do I get this from __init__.py fml
+    click.echo('0.1.1')
+    ctx.exit()
 
 
 @click.command(cls=ComplexCLI)
