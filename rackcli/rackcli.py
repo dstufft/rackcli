@@ -7,16 +7,20 @@ Apache License 2.0
 
 Stuff
 """
+import argparse
+import config
 
-import sys
-import click
+
+def cli():
+    # create the top-level parser
+    parser = argparse.ArgumentParser(prog='rackcli')
+    parser.add_argument('-c', '--cfg', required=False, default=False,
+                        help='optional configuration file path to use.')
+    return parser.parse_args()
+    # subparsers = parser.add_subparsers(help='sub-command help')
 
 
-@click.command()
-@click.option('--count', default=1, help='Number of greetings.')
-@click.option('--name', prompt='Your name',
-              help='The person to greet.')
-def main(count, name):
-    """Simple program that greets NAME for a total of COUNT times."""
-    for x in range(count):
-        click.echo('Hello %s!' % name)
+def main():
+    args = cli()
+    cfg = config.load_config(args.cfg)
+    print cfg
