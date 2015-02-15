@@ -24,7 +24,7 @@ test_requirements = [
 
 setup(
     name='rackcli',
-    version='0.1.0',
+    version='0.1.1',
     description="minimalistic rackspace cloud cli based on python-openstacksdk",
     long_description=readme + '\n\n' + history,
     author="Jesse Noller",
