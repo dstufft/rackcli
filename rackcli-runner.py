@@ -6,8 +6,8 @@
  invoking odd and arcane setuptools wizardry."""
 
 
-from rackcli.rackcli import main
+from rackcli.rackcli import cli
 
 
 if __name__ == '__main__':
-    main()
+    cli()
