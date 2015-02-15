@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 import os
 import click
 import ConfigParser
@@ -16,11 +15,12 @@ def validate_path(value):
     return value
 
 
-def load_config(override):
+def load_config(debug, override):
     """ Pulls the rackcli configuration file and reads it if it exists
     otherwise, warn the user.
     """
-    print('Attempting to load raxcli config.ini file.')
+    if debug:
+        click.echo('Attempting to load raxcli config.ini file.')
     if override:
         validate_path(override)
     # todo: handle windows %user stuff
@@ -43,6 +43,6 @@ def load_config(override):
             for key, value in parser.items(section):
                 sect[key] = value
             rv[section] = sect
-        if not rv:
+        if not rv and debug:
             click.echo("Warning: could not load %s." % cfg)
     return rv

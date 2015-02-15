@@ -4,5 +4,5 @@
 """rackcli.__main__: executed when rackcli directory is called as script."""
 
 
-from .rackcli import main
-main()
+from .rackcli import cli
+cli()
