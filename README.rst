@@ -20,4 +20,4 @@ minimalistic rackspace cloud cli based on python-openstacksdk
 Features
 --------
 
-* TODO
+* It's a platypus; it doesn't do much right now
