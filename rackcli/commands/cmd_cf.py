@@ -10,6 +10,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import glob
+import os
 import click
 from rackcli.rackcli import pass_ctx
 from rackcli import auth
@@ -208,12 +210,34 @@ def data_object(ctx, containername, objectname):
     click.echo(conn.object_store.get_object_data(oobj))
 
 
+@cli.command(name='upload-dir')
+@click.argument('directory', required=True)
+@click.argument('pattern', required=True)
+@pass_ctx
+def upload_directory(ctx, directory, pattern):
+    """Upload a directory to a container named after the specified directory to
+    Cloud Files. The pattern is a valid "glob" pattern - e.g *.* or *.mp3. The
+    directory name will be the container, and sub directories will become paths
+    within the parent container (not new containers).
+    """
+    container_name = os.path.basename(os.path.realpath(directory))
+    conn = auth.conn(ctx)
+    conn.object_store.create_container(container_name.decode("utf8"))
+
+    for root, dirs, files in os.walk(directory):
+        for file in glob.iglob(os.path.join(root, pattern)):
+            with open(file, "rb") as f:
+                conn.object_store.create_object(data=f.read(),
+                                                obj=file.decode("utf8"),
+                                                container=container_name)
+                click.echo('Uploaded: %s' % file)
+
+
 """
 TBD:
 conn.object_store.set_container_metadata
 conn.object_store.set_object_metadata
 conn.object_store.set_account_metadata
-conn.object_store.get_account_metadata
 
 
 from openstack.object_store.v1 import container, obj
