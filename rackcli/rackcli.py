@@ -1,11 +1,19 @@
 # -*- coding: utf-8 -*-
 
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
 """
 rackcli.py
 
-Apache License 2.0
-
-Stuff
 """
 import os
 import sys
@@ -17,7 +25,13 @@ class Context(object):
     """ Configuration context """
     def __init__(self):
         self.verbose = False
+        self.interactive = False
+        self.no_verify_ssl = False
         self.config = None
+        self.cfgfile = None
+        self.output = 'text'
+        self.profile = None
+        self.region = None
 
     def log(self, msg, *args):
         """Logs a message to stderr."""
@@ -25,8 +39,14 @@ class Context(object):
             msg %= args
         click.echo(msg, file=sys.stderr)
 
+    def die(self, msg, *args):
+        if args:
+            msg %= args
+        click.echo(msg, file=sys.stderr)
+        sys.exit(1)
+
     def vlog(self, msg, *args):
-        """Logs a message to stderr only if verbose is enabled."""
+        """Logs a message to stderr only if debug is enabled."""
         if self.verbose:
             self.log(msg, *args)
 
@@ -59,7 +79,9 @@ class ComplexCLI(click.MultiCommand):
 
 @click.command(cls=ComplexCLI)
 @click.version_option()
-@click.option('--debug', '-d', is_flag=True, default=False)
+@click.option('--verbose', '-v', is_flag=True, default=False)
+@click.option('--interactive', '-i', is_flag=True, default=False,
+              help='If enabled, turn on pagination and prompts as needed')
 @click.option('--no-verify-ssl', is_flag=True, default=False,
               help='Disable SSL - not recommended, considered harmful')
 @click.option('--config-file', '-c', required=False,
@@ -67,16 +89,21 @@ class ComplexCLI(click.MultiCommand):
 @click.option('--output', '-o', required=False, default='table',
               type=click.Choice(['json', 'text', 'table']),
               help='The formatting style for command output.')
-@click.option('--profile', '-p', required=False,
+@click.option('--profile', '-p', required=False, default='global',
               help='Use a specific profile from your credential file.')
 @click.option('--region', '-r', required=False,
               help='The region to use. Overrides config/env settings.')
 @pass_ctx
-def cli(ctx, debug, no_verify_ssl, config_file, output, profile, region):
+def cli(ctx, verbose, interactive, no_verify_ssl, config_file, output, profile,
+        region):
     """ rackcli [options] <command> <subcommand> [parameters] """
     overrides = False
+    ctx.verbose = verbose
+    ctx.interactive = interactive
+    ctx.no_verify_ssl = no_verify_ssl
+    ctx.output = output
+    ctx.profile = profile
+    ctx.region = region
     if config_file:
         overrides = config.validate_path(config_file)
-    # dump the loaded config - throwaway
-    click.echo(config.load_config(debug, overrides))
-    click.echo('Hello World')
+    ctx.config, ctx.cfgfile = config.load_config(ctx, overrides)
