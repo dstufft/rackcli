@@ -53,6 +53,23 @@ def container(ctx, list, containername, create, delete, metadata):
             click.echo('%s: %s' % (e[0], e[-1]))
 
 
+@cli.command(name='object', help='Object Operations')
+@click.option('--list', is_flag=True, required=False,
+              help='List all objects in a container.')
+@click.argument('containername', required=False)
+@click.argument('objectname', required=False)
+@pass_ctx
+def objects(ctx, list, containername, objectname):
+    conn = auth.conn(ctx)
+    if list:
+        if ctx.interactive:
+            click.echo_via_pager('\n'.join('Container: %s' % c.name
+                                           for c in
+                                           conn.object_store.objects(containername)))
+        else:
+            for object in conn.object_store.objects(containername):
+                click.echo(object.name)
+
 
 """
 conn.object_store.bulk_delete             conn.object_store.get_object_data
@@ -60,7 +77,7 @@ conn.object_store.get_object_metadata
 conn.object_store.copy_object             conn.object_store.objects
 conn.object_store.save_object
 conn.object_store.create_object           conn.object_store.session
-conn.object_store.delete_container        conn.object_store.set_account_metadata
+        conn.object_store.set_account_metadata
 conn.object_store.delete_object
 conn.object_store.get_account_metadata    conn.object_store.set_object_metadata
 """
