@@ -22,7 +22,7 @@ def cli(ctx):
 
 
 # Try compiling things into a container command
-@cli.command(name='container', help='Container Operations')
+@cli.command(name='containers', help='Container Operations')
 @click.option('--list', is_flag=True, required=False,
               help='List all Cloud Files containers')
 @click.option('--create', is_flag=True, required=False,
@@ -53,7 +53,7 @@ def container(ctx, list, containername, create, delete, metadata):
             click.echo('%s: %s' % (e[0], e[-1]))
 
 
-@cli.command(name='object', help='Object Operations')
+@cli.command(name='objects', help='Object Operations')
 @click.option('--list', is_flag=True, required=False,
               help='List all objects in a container.')
 @click.argument('containername', required=False)
