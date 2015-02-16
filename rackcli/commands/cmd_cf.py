@@ -21,6 +21,19 @@ from openstack.object_store.v1 import obj
 def cli(ctx):
     pass
 
+
+"""
+Cloudfile Level Account things
+"""
+@cli.command(name='metadata-account',
+             help='Get metadata about your Cloud Files Account')
+@pass_ctx
+def metatadata_account(ctx):
+    conn = auth.conn(ctx)
+    res = conn.object_store.get_account_metadata()
+    for e in res.items():
+        click.echo('%s: %s' % (e[0], e[-1]))
+
 """
 Container level operations
 """
@@ -58,7 +71,7 @@ def delete_container(ctx, containername):
 @cli.command(name='metadata-container', help='Get metadata about a container')
 @click.argument('containername')
 @pass_ctx
-def metatadat_container(ctx, containername):
+def metatadata_container(ctx, containername):
     conn = auth.conn(ctx)
     res = conn.object_store.get_container_metadata(containername)
     for e in res.items():
@@ -182,4 +195,15 @@ conn.object_store.set_container_metadata
 conn.object_store.set_object_metadata
 conn.object_store.set_account_metadata
 conn.object_store.get_account_metadata
+
+
+from openstack.object_store.v1 import container, obj
+
+cn = obj.Container({"name": "my container"})
+cn.read_ACL = "asdfasdfas"
+conn.set_container_metadata(cn)
+
+ob = obj.Object({"container": "my container", "object": "my object"})
+ob.content_type = "asdfasdfasdf"
+conn.set_object_metadata(ob)
 """
