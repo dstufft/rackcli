@@ -86,22 +86,22 @@ class ComplexCLI(click.MultiCommand):
               help='Disable SSL - not recommended, considered harmful')
 @click.option('--config-file', '-c', required=False,
               help='Optional Configuration file to use')
-@click.option('--output', '-o', required=False, default='table',
-              type=click.Choice(['json', 'text', 'table']),
-              help='The formatting style for command output.')
+# @click.option('--output', '-o', required=False, default='table',
+#              type=click.Choice(['json', 'text', 'table']),
+#              help='The formatting style for command output.')
 @click.option('--profile', '-p', required=False, default='global',
               help='Use a specific profile from your credential file.')
 @click.option('--region', '-r', required=False,
               help='The region to use. Overrides config/env settings.')
 @pass_ctx
-def cli(ctx, verbose, interactive, no_verify_ssl, config_file, output, profile,
+def cli(ctx, verbose, interactive, no_verify_ssl, config_file, profile,
         region):
     """ rackcli [options] <command> <subcommand> [parameters] """
     overrides = False
     ctx.verbose = verbose
     ctx.interactive = interactive
     ctx.no_verify_ssl = no_verify_ssl
-    ctx.output = output
+    # ctx.output = output
     ctx.profile = profile
     ctx.region = region
     if config_file:
